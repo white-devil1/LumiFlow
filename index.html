@@ -13,14 +13,14 @@
   
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="website">
-  <meta property="og:url" content="https://lumiflow.app/">
+  <meta property="og:url" content="https://white-devil1.github.io/LumiFlow/">
   <meta property="og:title" content="Lumiflow - Your photos. Your story. One PDF.">
   <meta property="og:description" content="Create stunning photo PDFs in seconds. No uploads, total privacy.">
   <meta property="og:image" content="https://picsum.photos/1200/630">
 
   <!-- Twitter -->
   <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:url" content="https://lumiflow.app/">
+  <meta property="twitter:url" content="https://white-devil1.github.io/LumiFlow/">
   <meta property="twitter:title" content="Lumiflow - Photo to PDF Storyteller">
   <meta property="twitter:description" content="Turn your photos into beautiful A4 PDF stories instantly. Free & Secure.">
   <meta property="twitter:image" content="https://picsum.photos/1200/630">
@@ -60,27 +60,24 @@
     font-family: 'Poppins', sans-serif;
   }
   
-  /* Hide Number Input Spinners (Chrome, Safari, Edge, Opera) */
+  /* Hide Number Input Spinners */
   input[type=number]::-webkit-inner-spin-button, 
   input[type=number]::-webkit-outer-spin-button { 
     -webkit-appearance: none; 
     margin: 0; 
   }
-  
-  /* Hide Number Input Spinners (Firefox) */
   input[type=number] {
     -moz-appearance: textfield;
   }
 
-  /* Hide Scrollbar on Mobile (Touch Devices) */
+  /* Hide Scrollbar on Mobile */
   @media (max-width: 768px) {
     html, body {
-      scrollbar-width: none; /* Firefox */
-      -ms-overflow-style: none; /* IE/Edge */
+      scrollbar-width: none;
+      -ms-overflow-style: none;
     }
-    
     html::-webkit-scrollbar, body::-webkit-scrollbar {
-      display: none; /* Chrome, Safari, Opera */
+      display: none;
     }
   }
 
@@ -92,27 +89,34 @@
     animation: shimmer 2s infinite;
   }
   
-  /* Stunning Splash Animations */
+  /* Animation Keyframes */
   @keyframes slide-up {
-    from { transform: translateY(30px); opacity: 0; }
+    from { transform: translateY(20px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
   }
+  
   @keyframes fade-in-down {
-    from { transform: translateY(-40px); opacity: 0; }
+    from { transform: translateY(-20px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
   }
+
+  @keyframes zoom-in-up {
+    0% { transform: translateY(20px) scale(0.9); opacity: 0; }
+    100% { transform: translateY(0) scale(1); opacity: 1; }
+  }
+  
   @keyframes pulse-slow {
     0%, 100% { opacity: 0.3; transform: scale(1); }
     50% { opacity: 0.5; transform: scale(1.05); }
   }
   
-  /* Storytelling Animation Keyframes - Updated for Smoothness */
+  /* Splash Grid Animation */
   @keyframes fly-to-grid {
     0% { 
       transform: translate(var(--sx), var(--sy)) rotate(var(--sr)) scale(0.5); 
       opacity: 0; 
     }
-    30% {
+    40% {
       opacity: 1;
     }
     100% { 
@@ -127,13 +131,13 @@
   }
   
   @keyframes fade-border-in {
-    from { opacity: 0; transform: scale(0.92); }
+    from { opacity: 0; transform: scale(0.95); }
     to { opacity: 1; transform: scale(1); }
   }
 
   @keyframes pop-in {
     0% { transform: scale(0); opacity: 0; }
-    60% { transform: scale(1.3); opacity: 1; }
+    70% { transform: scale(1.4); opacity: 1; }
     100% { transform: scale(1); opacity: 1; }
   }
 </style>
