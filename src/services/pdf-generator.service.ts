@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, from, switchMap, map } from 'rxjs';
+import { Observable, from } from 'rxjs';
 
 export interface PdfOptions {
   stretch: boolean;
@@ -40,20 +40,25 @@ export class PdfGeneratorService {
     const pageHeight = 297;
     
     // Config based on options
-    const margin = options.noMargins ? 5 : 10;
-    const padding = options.noMargins ? 0 : 5;
-
-    // Grid configuration: 2x2
-    const availableWidth = pageWidth - (margin * 2);
-    const availableHeight = pageHeight - (margin * 2);
+    // "Narrow Margin" (Default): Outer 10mm, Gap 5mm. Crisp but visible separation.
+    // "No Margins": Outer 5mm (Printer safety), Gap 1mm (Minimal separation).
     
+    const outerMargin = options.noMargins ? 5 : 10; 
+    const gap = options.noMargins ? 0 : 5; 
+
+    // Calculate dimensions of a single grid cell
+    // We have 2 columns and 2 rows per page.
+    // Width available for 2 cells = PageWidth - LeftMargin - RightMargin - GapBetweenColumns
+    const availableWidth = pageWidth - (outerMargin * 2) - gap; 
+    
+    // Height available for 2 cells = PageHeight - TopMargin - BottomMargin - GapBetweenRows
+    const availableHeight = pageHeight - (outerMargin * 2) - gap;
+
     const cellWidth = availableWidth / 2;
     const cellHeight = availableHeight / 2;
-    
-    const maxImgWidth = cellWidth - (padding * 2);
-    const maxImgHeight = cellHeight - (padding * 2);
 
     for (let i = 0; i < images.length; i++) {
+      // Add new page for every 4th image (starting from index 4, 8, etc.)
       if (i > 0 && i % 4 === 0) {
         pdf.addPage();
       }
@@ -63,8 +68,11 @@ export class PdfGeneratorService {
       const col = positionIndex % 2; 
       const row = Math.floor(positionIndex / 2); 
 
-      const xCellStart = margin + (col * cellWidth);
-      const yCellStart = margin + (row * cellHeight);
+      // Calculate the top-left coordinate of the CELL
+      // Col 0: outerMargin
+      // Col 1: outerMargin + cellWidth + gap
+      const cellXStart = outerMargin + (col * (cellWidth + gap));
+      const cellYStart = outerMargin + (row * (cellHeight + gap));
 
       let finalWidth = 0;
       let finalHeight = 0;
@@ -74,37 +82,38 @@ export class PdfGeneratorService {
       if (imgObj.customWidth !== undefined && imgObj.customHeight !== undefined) {
          if (imgObj.customX !== undefined && imgObj.customY !== undefined) {
             // Fully custom position (Absolute in cell)
+            // Percentages are relative to the CELL dimensions
             finalWidth = cellWidth * (imgObj.customWidth / 100);
             finalHeight = cellHeight * (imgObj.customHeight / 100);
-            finalX = xCellStart + (cellWidth * (imgObj.customX / 100));
-            finalY = yCellStart + (cellHeight * (imgObj.customY / 100));
+            finalX = cellXStart + (cellWidth * (imgObj.customX / 100));
+            finalY = cellYStart + (cellHeight * (imgObj.customY / 100));
          } else {
             // Centered custom size (Fallback)
-            finalWidth = maxImgWidth * (imgObj.customWidth / 100);
-            finalHeight = maxImgHeight * (imgObj.customHeight / 100);
-            finalX = xCellStart + padding + (maxImgWidth - finalWidth) / 2;
-            finalY = yCellStart + padding + (maxImgHeight - finalHeight) / 2;
+            finalWidth = cellWidth * (imgObj.customWidth / 100);
+            finalHeight = cellHeight * (imgObj.customHeight / 100);
+            finalX = cellXStart + (cellWidth - finalWidth) / 2;
+            finalY = cellYStart + (cellHeight - finalHeight) / 2;
          }
 
       } else if (options.stretch) {
-        // Force fit
-        finalWidth = maxImgWidth;
-        finalHeight = maxImgHeight;
-        finalX = xCellStart + padding;
-        finalY = yCellStart + padding;
+        // Force fit to cell
+        finalWidth = cellWidth;
+        finalHeight = cellHeight;
+        finalX = cellXStart;
+        finalY = cellYStart;
       } else {
-        // Preserve aspect ratio
+        // Preserve aspect ratio & Center (Contain)
         const dims = await this.getImageDimensions(imgObj.url);
         const scale = Math.min(
-          maxImgWidth / dims.width,
-          maxImgHeight / dims.height
+          cellWidth / dims.width,
+          cellHeight / dims.height
         );
         finalWidth = dims.width * scale;
         finalHeight = dims.height * scale;
         
         // Center in cell
-        finalX = xCellStart + padding + (maxImgWidth - finalWidth) / 2;
-        finalY = yCellStart + padding + (maxImgHeight - finalHeight) / 2;
+        finalX = cellXStart + (cellWidth - finalWidth) / 2;
+        finalY = cellYStart + (cellHeight - finalHeight) / 2;
       }
 
       pdf.addImage(imgObj.url, 'JPEG', finalX, finalY, finalWidth, finalHeight);
