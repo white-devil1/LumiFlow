@@ -7,8 +7,10 @@ export interface PdfOptions {
 
 export interface PdfImage {
   url: string;
-  customWidth?: number; // 0-100
-  customHeight?: number; // 0-100
+  customWidth?: number; // 0-100% of cell width
+  customHeight?: number; // 0-100% of cell height
+  customX?: number; // 0-100% (Left offset)
+  customY?: number; // 0-100% (Top offset)
 }
 
 // Declare the global window object to access jsPDF from CDN
@@ -45,6 +47,7 @@ export class PdfGeneratorService {
     const cellWidth = availableWidth / 2;
     const cellHeight = availableHeight / 2;
     
+    // Max Dimensions for Auto-Layout (Standard/Stretch)
     const maxImgWidth = cellWidth - (padding * 2);
     const maxImgHeight = cellHeight - (padding * 2);
 
@@ -65,19 +68,43 @@ export class PdfGeneratorService {
 
       let finalWidth = 0;
       let finalHeight = 0;
+      let finalX = 0;
+      let finalY = 0;
 
       // Logic:
-      // 1. If custom dimensions are set for this specific image, use them (percentage of max cell size).
-      // 2. Else if global stretch is ON, use max size.
-      // 3. Else use Aspect Ratio fit.
+      // 1. If custom dimensions AND POSITION are set, use them as absolute percentages of the cell.
+      // 2. Else if global stretch is ON, use max size centered.
+      // 3. Else use Aspect Ratio fit centered.
 
       if (imgObj.customWidth !== undefined && imgObj.customHeight !== undefined) {
-         finalWidth = maxImgWidth * (imgObj.customWidth / 100);
-         finalHeight = maxImgHeight * (imgObj.customHeight / 100);
+         // Manual sizing logic
+         // If customX/Y exists, use absolute positioning relative to cell start (ignoring padding)
+         // If not exists (legacy/centered), calculate centered relative to maxImgWidth/Height area + padding
+
+         if (imgObj.customX !== undefined && imgObj.customY !== undefined) {
+            // Fully custom position
+            finalWidth = cellWidth * (imgObj.customWidth / 100);
+            finalHeight = cellHeight * (imgObj.customHeight / 100);
+            finalX = xCellStart + (cellWidth * (imgObj.customX / 100));
+            finalY = yCellStart + (cellHeight * (imgObj.customY / 100));
+         } else {
+            // Centered custom size (fallback for old behavior if needed, though app updates usually populate X/Y now)
+            // Use maxImgWidth as base for percentage to match previous logic?
+            // Actually, let's migrate to cell-based percentage for consistency if X/Y is used.
+            // But to be safe, if no X/Y, assume centered in the padding box.
+            
+            finalWidth = maxImgWidth * (imgObj.customWidth / 100);
+            finalHeight = maxImgHeight * (imgObj.customHeight / 100);
+            finalX = xCellStart + padding + (maxImgWidth - finalWidth) / 2;
+            finalY = yCellStart + padding + (maxImgHeight - finalHeight) / 2;
+         }
+
       } else if (options.stretch) {
         // Force fit to the cell box (minus padding)
         finalWidth = maxImgWidth;
         finalHeight = maxImgHeight;
+        finalX = xCellStart + padding;
+        finalY = yCellStart + padding;
       } else {
         // Preserve aspect ratio
         const dims = await this.getImageDimensions(imgObj.url);
@@ -87,13 +114,13 @@ export class PdfGeneratorService {
         );
         finalWidth = dims.width * scale;
         finalHeight = dims.height * scale;
+        
+        // Center in cell
+        finalX = xCellStart + padding + (maxImgWidth - finalWidth) / 2;
+        finalY = yCellStart + padding + (maxImgHeight - finalHeight) / 2;
       }
 
-      // Center in cell
-      const xObj = xCellStart + padding + (maxImgWidth - finalWidth) / 2;
-      const yObj = yCellStart + padding + (maxImgHeight - finalHeight) / 2;
-
-      pdf.addImage(imgObj.url, 'JPEG', xObj, yObj, finalWidth, finalHeight);
+      pdf.addImage(imgObj.url, 'JPEG', finalX, finalY, finalWidth, finalHeight);
     }
 
     pdf.save(filename);

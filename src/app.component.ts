@@ -13,14 +13,21 @@ interface AppImage {
   // Custom sizing in percentage (0-100)
   customWidth?: number; 
   customHeight?: number;
+  // Custom positioning in percentage (0-100)
+  customX?: number;
+  customY?: number;
 }
 
 interface DragState {
   imgId: string;
   startX: number;
   startY: number;
+  
   startWidthPct: number;
   startHeightPct: number;
+  startXPct: number;
+  startYPct: number;
+
   containerWidth: number;
   containerHeight: number;
   direction: string; // 'n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'
@@ -60,7 +67,7 @@ export class AppComponent implements OnDestroy, OnInit {
   editingImageId = signal<string | null>(null);
   
   // Temp state for canceling edits
-  private tempImageState: { [key: string]: { w?: number, h?: number } } = {};
+  private tempImageState: { [key: string]: { w?: number, h?: number, x?: number, y?: number } } = {};
 
   // Drag State
   private dragState: DragState | null = null;
@@ -163,7 +170,9 @@ export class AppComponent implements OnDestroy, OnInit {
           name: files[fileIdx].name,
           // Reset custom sizing when replacing image
           customWidth: undefined,
-          customHeight: undefined
+          customHeight: undefined,
+          customX: undefined,
+          customY: undefined
         };
         
         fileIdx++;
@@ -271,53 +280,74 @@ export class AppComponent implements OnDestroy, OnInit {
       // Save state before editing for "Cancel"
       const img = this.images().find(i => i.id === id);
       if (img) {
-         this.tempImageState[id] = { w: img.customWidth, h: img.customHeight };
+         this.tempImageState[id] = { 
+           w: img.customWidth, 
+           h: img.customHeight,
+           x: img.customX,
+           y: img.customY
+         };
       }
 
-      // Logic: Initialize wrapper size to match natural aspect ratio within the cell
+      // Initialize defaults if undefined
       this.images.update(imgs => imgs.map(img => {
-        if (img.id === id && img.customWidth === undefined) {
-           let initW = 100;
-           let initH = 100;
+        if (img.id === id) {
+           let initW = img.customWidth;
+           let initH = img.customHeight;
+           let initX = img.customX;
+           let initY = img.customY;
 
-           if (img.originalWidth > 0 && img.originalHeight > 0) {
-              const imgRatio = img.originalWidth / img.originalHeight;
-              // A4 quadrant ratio ~ 0.707 (210/297)
-              const cellRatio = 0.707; 
-
-              if (imgRatio > cellRatio) {
-                 // Image is wider than cell (relative to height) -> Fit to Width (100%)
-                 initW = 100;
-                 initH = (cellRatio / imgRatio) * 100; 
-              } else {
-                 // Image is taller than cell -> Fit to Height (100%)
-                 initH = 100;
-                 initW = (imgRatio / cellRatio) * 100;
-              }
+           // Calculate Size if missing
+           if (initW === undefined) {
+             if (img.originalWidth > 0 && img.originalHeight > 0) {
+                const imgRatio = img.originalWidth / img.originalHeight;
+                const cellRatio = 0.707; // 210/297 (Approx A4 ratio)
+                if (imgRatio > cellRatio) {
+                   initW = 100;
+                   initH = (cellRatio / imgRatio) * 100; 
+                } else {
+                   initH = 100;
+                   initW = (imgRatio / cellRatio) * 100;
+                }
+             } else {
+               initW = 100;
+               initH = 100;
+             }
            }
            
-           return { ...img, customWidth: initW, customHeight: initH };
+           // Calculate Position if missing (Center it)
+           if (initX === undefined) {
+             initX = (100 - initW!) / 2;
+           }
+           if (initY === undefined) {
+             initY = (100 - initH!) / 2;
+           }
+           
+           return { ...img, customWidth: initW, customHeight: initH, customX: initX, customY: initY };
         }
         return img;
       }));
       this.editingImageId.set(id);
-      this.activeSlotId.set(null); // Clear active selection when editing
+      this.activeSlotId.set(null);
     }
   }
   
   cancelEdit(id: string) {
       const original = this.tempImageState[id];
-      // Revert to original state
       this.images.update(imgs => imgs.map(img => {
         if (img.id === id) {
-             // If original state was undefined (no custom size), revert to that
-            if (original && original.w === undefined) {
-                 const { customWidth, customHeight, ...rest } = img;
-                 return rest;
-            }
-            // Else revert to previous numbers
             if (original) {
-                return { ...img, customWidth: original.w, customHeight: original.h };
+                // If original state had undefined width, we must return to undefined to resume 'auto' mode
+                if (original.w === undefined) {
+                    const { customWidth, customHeight, customX, customY, ...rest } = img;
+                    return rest;
+                }
+                return { 
+                  ...img, 
+                  customWidth: original.w, 
+                  customHeight: original.h,
+                  customX: original.x,
+                  customY: original.y
+                };
             }
         }
         return img;
@@ -329,8 +359,8 @@ export class AppComponent implements OnDestroy, OnInit {
   resetImageSize(id: string) {
      this.images.update(imgs => imgs.map(img => {
       if (img.id === id) {
-        // Remove custom width/height to revert to 'Contain' mode
-        const { customWidth, customHeight, ...rest } = img;
+        // Remove custom width/height/pos to revert to 'Contain' mode
+        const { customWidth, customHeight, customX, customY, ...rest } = img;
         return rest;
       }
       return img;
@@ -345,7 +375,6 @@ export class AppComponent implements OnDestroy, OnInit {
     
     const containerRect = container.getBoundingClientRect();
     
-    // Handle both mouse and touch events
     const clientX = 'touches' in event ? event.touches[0].clientX : event.clientX;
     const clientY = 'touches' in event ? event.touches[0].clientY : event.clientY;
 
@@ -355,6 +384,8 @@ export class AppComponent implements OnDestroy, OnInit {
       startY: clientY,
       startWidthPct: img.customWidth || 100,
       startHeightPct: img.customHeight || 100,
+      startXPct: img.customX || 0,
+      startYPct: img.customY || 0,
       containerWidth: containerRect.width,
       containerHeight: containerRect.height,
       direction
@@ -387,7 +418,11 @@ export class AppComponent implements OnDestroy, OnInit {
   private handleDragMove(clientX: number, clientY: number) {
      if (!this.dragState) return;
 
-    const { direction, containerWidth, containerHeight, startX, startY, startWidthPct, startHeightPct } = this.dragState;
+    const { 
+      direction, containerWidth, containerHeight, 
+      startX, startY, 
+      startWidthPct, startHeightPct, startXPct, startYPct 
+    } = this.dragState;
 
     const dx = clientX - startX;
     const dy = clientY - startY;
@@ -398,32 +433,60 @@ export class AppComponent implements OnDestroy, OnInit {
 
     let newWidth = startWidthPct;
     let newHeight = startHeightPct;
+    let newX = startXPct;
+    let newY = startYPct;
 
-    // Width Logic
+    // Logic: Adjust Width/Height and X/Y based on direction
+    // E.g. Dragging Left (West) means width increases, but X decreases (moves left).
+    // Dragging Right (East) means width increases, X stays.
+
+    // Horizontal
     if (direction.includes('e')) {
-        // Dragging right increases width
-        newWidth += dxPct;
+        newWidth = startWidthPct + dxPct;
     } else if (direction.includes('w')) {
-        // Dragging left increases width (moving mouse left = negative dx, so we subtract)
-        newWidth -= dxPct;
+        newWidth = startWidthPct - dxPct;
+        newX = startXPct + dxPct;
     }
 
-    // Height Logic
+    // Vertical
     if (direction.includes('s')) {
-        // Dragging down increases height
-        newHeight += dyPct;
+        newHeight = startHeightPct + dyPct;
     } else if (direction.includes('n')) {
-        // Dragging up increases height (moving mouse up = negative dy, so we subtract)
-        newHeight -= dyPct;
+        newHeight = startHeightPct - dyPct;
+        newY = startYPct + dyPct;
     }
 
-    // Constraints
-    newWidth = Math.max(5, Math.min(100, newWidth));
-    newHeight = Math.max(5, Math.min(100, newHeight));
+    // Constraints (Min Size)
+    // We do not strictly constrain max size > 100 to allow cropping/overflow effects if desired, 
+    // but typically users want it inside. Let's soft cap or just cap min size.
+    
+    if (newWidth < 5) {
+      // Prevent inverting
+      // Ideally we would lock X here too if it's the West handle
+      newWidth = 5; 
+      if (direction.includes('w')) {
+         // If we hit min width dragging left, X should stop moving too relative to the anchor
+         // This simple logic might drift slightly but is acceptable for this use case
+         newX = startXPct + (startWidthPct - 5);
+      }
+    }
+    
+    if (newHeight < 5) {
+      newHeight = 5;
+      if (direction.includes('n')) {
+         newY = startYPct + (startHeightPct - 5);
+      }
+    }
 
     this.images.update(imgs => imgs.map(img => {
       if (img.id === this.dragState!.imgId) {
-        return { ...img, customWidth: newWidth, customHeight: newHeight };
+        return { 
+          ...img, 
+          customWidth: newWidth, 
+          customHeight: newHeight,
+          customX: newX,
+          customY: newY
+        };
       }
       return img;
     }));
@@ -456,7 +519,9 @@ export class AppComponent implements OnDestroy, OnInit {
       const pdfImages: PdfImage[] = validImages.map(img => ({
         url: img.url!,
         customWidth: img.customWidth,
-        customHeight: img.customHeight
+        customHeight: img.customHeight,
+        customX: img.customX,
+        customY: img.customY
       }));
       
       const date = new Date().toISOString().split('T')[0];

@@ -352,14 +352,22 @@
                     
                     @if (img.url) {
                       <!-- Image Content -->
-                      <div class="relative w-full h-full flex items-center justify-center bg-slate-50 md:bg-transparent">
+                      <div class="relative w-full h-full bg-slate-50 md:bg-transparent"
+                           [class.flex]="!img.customX && editingImageId() !== img.id"
+                           [class.items-center]="!img.customX && editingImageId() !== img.id"
+                           [class.justify-center]="!img.customX && editingImageId() !== img.id">
                          <!-- Image -->
                          <div class="relative"
+                              [class.absolute]="editingImageId() === img.id || img.customX !== undefined"
+                              [class.top-0]="editingImageId() === img.id || img.customX !== undefined"
+                              [class.left-0]="editingImageId() === img.id || img.customX !== undefined"
                               [class.border-2]="editingImageId() === img.id"
                               [class.border-blue-500]="editingImageId() === img.id"
                               [class.border-dashed]="editingImageId() === img.id"
                               [style.width.%]="img.customWidth || 100"
-                              [style.height.%]="img.customHeight || 100">
+                              [style.height.%]="img.customHeight || 100"
+                              [style.left.%]="img.customX"
+                              [style.top.%]="img.customY">
                              
                              <img [src]="img.url" 
                                   class="w-full h-full block transition-shadow duration-300" 
