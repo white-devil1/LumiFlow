@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Observable, from, switchMap, map } from 'rxjs';
 
 export interface PdfOptions {
   stretch: boolean;
@@ -21,11 +22,14 @@ declare const window: any;
 })
 export class PdfGeneratorService {
 
-  // Accepts an array of PdfImage objects now
-  async generatePdf(images: PdfImage[], filename: string = 'photos.pdf', options: PdfOptions = { stretch: false, noMargins: false }): Promise<void> {
+  generatePdf(images: PdfImage[], filename: string = 'photos.pdf', options: PdfOptions = { stretch: false, noMargins: false }): Observable<void> {
+    // Wrap the async process in an Observable
+    return from(this.createPdf(images, filename, options));
+  }
+
+  private async createPdf(images: PdfImage[], filename: string, options: PdfOptions): Promise<void> {
     if (!window.jspdf) {
-      console.error('jsPDF not loaded');
-      return;
+      throw new Error('jsPDF not loaded');
     }
 
     const { jsPDF } = window.jspdf;
@@ -37,7 +41,6 @@ export class PdfGeneratorService {
     
     // Config based on options
     const margin = options.noMargins ? 5 : 10;
-    // Inner padding between cell edge and image
     const padding = options.noMargins ? 0 : 5;
 
     // Grid configuration: 2x2
@@ -47,21 +50,18 @@ export class PdfGeneratorService {
     const cellWidth = availableWidth / 2;
     const cellHeight = availableHeight / 2;
     
-    // Max Dimensions for Auto-Layout (Standard/Stretch)
     const maxImgWidth = cellWidth - (padding * 2);
     const maxImgHeight = cellHeight - (padding * 2);
 
     for (let i = 0; i < images.length; i++) {
-      // Add new page if we filled the previous one (4 images per page)
       if (i > 0 && i % 4 === 0) {
         pdf.addPage();
       }
 
       const imgObj = images[i];
-      const positionIndex = i % 4; // 0, 1, 2, 3
-      
-      const col = positionIndex % 2; // 0 or 1
-      const row = Math.floor(positionIndex / 2); // 0 or 1
+      const positionIndex = i % 4; 
+      const col = positionIndex % 2; 
+      const row = Math.floor(positionIndex / 2); 
 
       const xCellStart = margin + (col * cellWidth);
       const yCellStart = margin + (row * cellHeight);
@@ -71,28 +71,15 @@ export class PdfGeneratorService {
       let finalX = 0;
       let finalY = 0;
 
-      // Logic:
-      // 1. If custom dimensions AND POSITION are set, use them as absolute percentages of the cell.
-      // 2. Else if global stretch is ON, use max size centered.
-      // 3. Else use Aspect Ratio fit centered.
-
       if (imgObj.customWidth !== undefined && imgObj.customHeight !== undefined) {
-         // Manual sizing logic
-         // If customX/Y exists, use absolute positioning relative to cell start (ignoring padding)
-         // If not exists (legacy/centered), calculate centered relative to maxImgWidth/Height area + padding
-
          if (imgObj.customX !== undefined && imgObj.customY !== undefined) {
-            // Fully custom position
+            // Fully custom position (Absolute in cell)
             finalWidth = cellWidth * (imgObj.customWidth / 100);
             finalHeight = cellHeight * (imgObj.customHeight / 100);
             finalX = xCellStart + (cellWidth * (imgObj.customX / 100));
             finalY = yCellStart + (cellHeight * (imgObj.customY / 100));
          } else {
-            // Centered custom size (fallback for old behavior if needed, though app updates usually populate X/Y now)
-            // Use maxImgWidth as base for percentage to match previous logic?
-            // Actually, let's migrate to cell-based percentage for consistency if X/Y is used.
-            // But to be safe, if no X/Y, assume centered in the padding box.
-            
+            // Centered custom size (Fallback)
             finalWidth = maxImgWidth * (imgObj.customWidth / 100);
             finalHeight = maxImgHeight * (imgObj.customHeight / 100);
             finalX = xCellStart + padding + (maxImgWidth - finalWidth) / 2;
@@ -100,7 +87,7 @@ export class PdfGeneratorService {
          }
 
       } else if (options.stretch) {
-        // Force fit to the cell box (minus padding)
+        // Force fit
         finalWidth = maxImgWidth;
         finalHeight = maxImgHeight;
         finalX = xCellStart + padding;
