@@ -40,11 +40,11 @@ export class PdfGeneratorService {
     const pageHeight = 297;
     
     // Config based on options
-    // "Narrow Margin" (Default): Outer 10mm, Gap 5mm. Crisp but visible separation.
+    // "Narrow Margin" (Default): Outer 6mm, Gap 4mm. Very sleek, distinct gap.
     // "No Margins": Outer 5mm (Printer safety), Gap 1mm (Minimal separation).
     
-    const outerMargin = options.noMargins ? 5 : 10; 
-    const gap = options.noMargins ? 0 : 5; 
+    const outerMargin = options.noMargins ? 5 : 6; 
+    const gap = options.noMargins ? 0 : 4; 
 
     // Calculate dimensions of a single grid cell
     // We have 2 columns and 2 rows per page.

@@ -55,13 +55,13 @@
       <div class="transition-all duration-300 mx-auto max-w-[210mm] relative
                   md:bg-white md:border md:border-slate-200 md:shadow-2xl md:rounded-lg md:aspect-[210/297] md:overflow-hidden
                   bg-transparent h-auto w-full"
-           [class.md:p-8]="!state.noMargins()"
+           [class.md:p-5]="!state.noMargins()"
            [class.md:p-2]="state.noMargins()">
            
            <div class="absolute inset-0 bg-stone-50 opacity-20 pointer-events-none hidden md:block"></div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 md:h-full gap-6 md:gap-8"
-             [class.md:gap-8]="!state.noMargins()"
+        <div class="grid grid-cols-1 md:grid-cols-2 md:h-full gap-6"
+             [class.md:gap-4]="!state.noMargins()"
              [class.md:gap-2]="state.noMargins()">
              
           @for (img of page; track img.id; let imgIdx = $index) {

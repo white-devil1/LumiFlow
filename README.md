@@ -1,120 +1,180 @@
-# Lumiflow - Photo to PDF Storyteller
+<div align="center">
 
-Lumiflow is a modern, zoneless Angular application designed to arrange photos into beautiful A4 PDF layouts. Built with performance and user experience in mind, it allows users to upload, arrange, resize, and export photo grids directly from the browser without server-side processing.
+![Lumiflow Banner](https://placehold.co/1200x400/1E1B4B/38bdf8?text=LUMIFLOW&font=montserrat)
 
-## 🚀 Features
+# LUMIFLOW
+### Photo to PDF Storyteller
 
-### Core Functionality
-- **Smart Photo Grid**: Automatically arranges photos into 2x2 grids on A4 pages.
-- **Drag & Drop Adjustment**: Resize and move photos within their slots for the perfect crop.
-- **High-Quality Export**: Generates high-resolution PDFs using `jsPDF`.
-- **Privacy First**: All image processing happens locally in the browser. No images are uploaded to a server.
+**Your photos. Your story. One PDF.**
 
-### User Experience
-- **Interactive Setup**: Choose the number of photos to start your session.
-- **Dynamic Splash Screen**: A visually stunning introduction with CSS animations.
-- **Live Preview**: See exactly how your PDF will look before downloading.
-- **Customization**: 
-  - **Global Stretch**: Force images to fill their slots.
-  - **Margins**: Toggle between "Narrow Margins" (default) and "No Margins".
+[![Angular](https://img.shields.io/badge/Angular-v18%2B-dd0031.svg?style=flat&logo=angular)](https://angular.io)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178c6.svg?style=flat&logo=typescript)](https://www.typescriptlang.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38B2AC.svg?style=flat&logo=tailwind-css)](https://tailwindcss.com/)
+[![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
----
+<p class="description">
+  Lumiflow is a cutting-edge, zoneless Angular application designed to curate, arrange, and export high-resolution photo grids into A4 PDFs. Built for performance and privacy, it performs all image processing client-side.
+</p>
 
-## 🛠 Tech Stack
+[View Demo](https://lumiflow.app/) · [Report Bug](https://github.com/lumiflow/issues) · [Request Feature](https://github.com/lumiflow/issues)
 
-- **Framework**: [Angular v18+](https://angular.dev) (Zoneless, Signals, Standalone Components)
-- **Styling**: [Tailwind CSS](https://tailwindcss.com) (Utility-first styling)
-- **PDF Generation**: [jsPDF](https://github.com/parallax/jsPDF) (Client-side PDF creation)
-- **State Management**: Angular Signals (`signal`, `computed`) & RxJS
-- **Build Tool**: Angular CLI
+</div>
 
 ---
 
-## 🏗 Architecture
+## 📑 Table of Contents
+- [✨ Key Features](#-key-features)
+- [🔧 Dependencies & Versions](#-dependencies--versions)
+- [🏗 Architecture & Design](#-architecture--design)
+- [💻 Installation & Setup](#-installation--setup)
+- [📱 Usage Guide](#-usage-guide)
+- [🧠 Technical Highlights](#-technical-highlights)
+- [🛣 Roadmap](#-roadmap)
 
-The application follows a **Service-Based Architecture** using Angular's latest reactivity primitives (Signals).
+---
 
-### Project Structure
+## ✨ Key Features
+
+### 🎨 Visual & Layout Engine
+*   **Smart 2x2 Grid System**: Automatically calculates layout matrices to fit 4 photos per A4 page perfectly.
+*   **Dynamic Pagination**: Seamlessly adds new pages as you upload more photos (4, 8, 12... unlimited).
+*   **Drag & Drop Editing**:
+    *   **Pan**: Click and drag inside a cell to reposition the image.
+    *   **Resize**: Use 8-point handle controls to scale images with precision.
+    *   **Aspect Ratio Locking**: Smart scaling preserves image quality.
+*   **Reordering**: Intuitive "Move Left" and "Move Right" controls to swap image positions across the grid.
+
+### 🖨 PDF Generation (jsPDF)
+*   **Client-Side Rendering**: Generates PDFs directly in the browser using `jsPDF`. No server required.
+*   **Margin Modes**:
+    *   **Narrow Margins (Default)**: Optimized 6mm outer / 4mm gap for a crisp, professional look.
+    *   **No Margins**: Maximizes image size with minimal 5mm printer-safe edges.
+*   **Global Stretch**: Optional mode to force all images to fill their grid cells entirely.
+
+### 🛡 Privacy & Performance
+*   **Local Processing**: Images are processed via HTML5 Canvas and `FileReader` locally. **Zero data upload**.
+*   **Image Optimization**: Automatic downscaling of massive images to 1500px max dimension to prevent browser crashes and reduce PDF size while maintaining print quality.
+*   **Zoneless Rendering**: Built with `provideZonelessChangeDetection()` for next-gen Angular performance.
+
+---
+
+## 🔧 Dependencies & Versions
+
+This project leverages the latest web technologies.
+
+| Dependency | Version | Purpose |
+| :--- | :--- | :--- |
+| **Angular** | `^21.1.0` | Core Framework (Zoneless, Signals) |
+| **TypeScript** | `~5.x` | Static Typing |
+| **RxJS** | `^7.8.2` | Reactive Streams (Drag logic, file reading) |
+| **Tailwind CSS** | `3.4 (CDN)` | Utility-first Styling |
+| **jsPDF** | `2.5.1` | PDF Generation Engine |
+| **Google Fonts** | `Inter & Poppins` | Typography |
+
+---
+
+## 🏗 Architecture & Design
+
+Lumiflow follows a **Service-Based, Signal-Driven** architecture.
+
+### Directory Structure
 ```
 src/
-├── app.component.ts          # Root orchestrator (Layout & Modal logic)
+├── app.component.ts           # Root Orchestrator (Modal handling, global layout)
 ├── services/
-│   ├── app-state.service.ts      # Global state (Images, Settings, Pagination)
-│   ├── pdf-generator.service.ts  # Logic for PDF coordinate calculations & export
-│   └── image-processor.service.ts # Image optimization, compression & Base64 conversion
+│   ├── app-state.service.ts       # Single Source of Truth (Signals)
+│   ├── pdf-generator.service.ts   # Mathematical logic for PDF coordinates
+│   └── image-processor.service.ts # Canvas manipulation & Base64 encoding
 ├── components/
-│   ├── header/               # Navigation & Global Actions (Download, Reset)
-│   ├── splash/               # Intro Animation
-│   ├── setup/                # Initial configuration (Photo count)
-│   └── workspace/            # Main editor (Grid, Drag logic, Uploads)
+│   ├── header/                # Global Settings & Actions
+│   ├── splash/                # Intro Animations (CSS Keyframes)
+│   ├── setup/                 # Initial Configuration Form
+│   └── workspace/             # The Core Editor (Grids, Drag Logic)
+└── index.html                 # SEO, Meta Tags, Tailwind Injection
 ```
 
-### Key Architectural Decisions
-
-1.  **Zoneless Change Detection**: The app uses `provideZonelessChangeDetection()` for high performance, relying on Signals to trigger UI updates only when necessary.
-2.  **OnPush Strategy**: All components use `ChangeDetectionStrategy.OnPush` to minimize render cycles.
-3.  **Client-Side Processing**: Heavy tasks like image resizing (Canvas) and PDF generation occur in the main thread (or microtasks) using Services to keep Components lean.
-4.  **Signal-Based State**: `AppStateService` acts as the single source of truth. Components read signals (`this.state.images()`) and call methods (`this.state.updateImage(...)`) to mutate state.
-
----
-
-## 🔄 User Workflow
-
-1.  **Splash Screen**: The user is greeted by an animated entry screen.
-2.  **Setup Phase**:
-    - User selects the total number of photos they wish to arrange.
-    - User clicks "Create Your PDF".
-3.  **Workspace Phase**:
-    - The app generates empty slots arranged in pages (4 slots per page).
-    - User clicks a slot to upload an image.
-    - **Adjustment**: 
-        - Users can click "Adjust Size" to enter Edit Mode.
-        - In Edit Mode, drag the image edges to resize or the center to move it within the cell.
-    - **Reordering**: Move images between slots using the arrow buttons.
-4.  **Export Phase**:
-    - User configures global settings (Stretch, Margins) in the header.
-    - Clicking "Export PDF" compiles the visual grid into a PDF file.
+### State Management Strategy
+1.  **AppStateService**: Holds the state (`images`, `settings`) in **Signals**.
+2.  **Computed Signals**: Derived state (e.g., `pages` array calculated from linear `images` array) updates automatically.
+3.  **OnPush Components**: All components use `ChangeDetectionStrategy.OnPush` for maximum efficiency.
+4.  **RxJS Interop**: Used primarily for complex DOM events (Drag & Drop streams) and File Reading, bridging back to Signals for UI updates.
 
 ---
 
-## 📦 Deployment
+## 💻 Installation & Setup
 
-This project includes a GitHub Actions workflow for automatic deployment to GitHub Pages.
+### Prerequisites
+*   Node.js v18 or higher
+*   NPM v9 or higher
 
-### Workflow File: `.github/workflows/deploy.yml`
-- **Trigger**: Pushes to the `main` branch.
-- **Process**:
-  1.  Checkout code.
-  2.  Install dependencies (`npm ci`).
-  3.  Build Angular app (`npm run build`).
-  4.  Upload build artifacts.
-  5.  Deploy to GitHub Pages environment.
+### Steps
 
-### Prerequisites for Deployment
-1.  Go to your GitHub Repository **Settings** > **Pages**.
-2.  Set **Source** to "GitHub Actions".
-3.  Ensure your `angular.json` output path matches the workflow config (default: `dist/lumiflow/browser`).
+1.  **Clone the Repository**
+    ```bash
+    git clone https://github.com/your-username/lumiflow.git
+    cd lumiflow
+    ```
 
----
-
-## 💻 Running Locally
-
-1.  **Install Dependencies**:
+2.  **Install Dependencies**
     ```bash
     npm install
     ```
 
-2.  **Start Development Server**:
+3.  **Run Development Server**
     ```bash
     npm start
     ```
-    Navigate to `http://localhost:4200`.
+    Open `http://localhost:4200` in your browser.
 
-3.  **Build for Production**:
+4.  **Build for Production**
     ```bash
     npm run build
     ```
+    Artifacts will be stored in `dist/`.
 
 ---
 
-*Lumiflow is a demonstration of modern Angular capabilities, combining complex state management with intuitive UI design.*
+## 📱 Usage Guide
+
+1.  **Welcome Screen**: Wait for the animation to complete and click **"Dive In"**.
+2.  **Setup**: Select the number of photos you want to arrange (e.g., 4, 8, 12).
+3.  **Upload**: Click any "+" slot to upload images. You can select multiple files at once.
+4.  **Edit**:
+    *   Click **"Adjust Size"** on an image.
+    *   Drag corners to resize. Drag center to move.
+    *   Click **"Done"** to save.
+5.  **Configure**: Use the top bar to toggle **"No Margins"** or **"Global Stretch"**.
+6.  **Export**: Click **"Export PDF"** to download your file.
+
+---
+
+## 🧠 Technical Highlights
+
+### The PDF Coordinate System
+The `PdfGeneratorService` treats the A4 page (210mm x 297mm) as a coordinate system.
+*   **Logic**: Iterates through the `images` array.
+*   **Math**: Calculates `x, y, width, height` based on:
+    *   Current Column (0 or 1)
+    *   Current Row (0 or 1)
+    *   Selected Margin (6mm vs 5mm)
+    *   Grid Gap (4mm vs 0mm)
+*   **Customization**: If a user manually resizes an image in the UI, those percentage-based values (`customWidth`, `customX`) are projected onto the PDF cell dimensions mathematically.
+
+### Zoneless Drag & Drop
+The drag logic in `WorkspaceComponent` uses `RxJS` streams (`fromEvent`, `switchMap`, `takeUntil`) to handle mouse and touch events outside of the Angular zone where possible, only updating the specific Signal (`updateImageById`) on frame updates to ensure smooth 60fps interactions on mobile devices.
+
+---
+
+## 🛣 Roadmap
+
+*   [ ] **Filters & Effects**: Add grayscale, sepia, and brightness controls.
+*   [ ] **Custom Grid Layouts**: Support for 1x1, 3x3, and collage layouts.
+*   [ ] **Text Captions**: Allow users to add text descriptions below photos.
+*   [ ] **PWA Support**: Install Lumiflow as a native app on iOS/Android.
+*   [ ] **Cloud Sync (Optional)**: Save sessions to LocalStorage or Firebase.
+
+---
+
+<div align="center">
+  <sub>Built with ❤️ by the Lumiflow Team. Powered by Angular.</sub>
+</div>
