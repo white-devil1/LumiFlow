@@ -35,11 +35,12 @@ import { AppStateService } from '../../services/app-state.service';
         
         @if (canInstall()) {
            <button (click)="installPwa()" 
-                   class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-bold uppercase tracking-wider rounded-lg border border-white/10 transition-colors animate-pulse-slow">
+                   class="flex items-center gap-2 px-3 py-1.5 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 rounded-lg transition-all animate-pulse-slow font-bold uppercase tracking-wider text-xs shadow-[0_0_15px_rgba(6,182,212,0.2)]">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-4">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
               </svg>
-              Install App
+              <span class="hidden sm:inline">Install App</span>
+              <span class="inline sm:hidden">Install</span>
            </button>
         }
 
@@ -96,6 +97,7 @@ export class HeaderComponent implements OnInit {
       this.deferredPrompt = e;
       // Update UI notify the user they can install the PWA
       this.canInstall.set(true);
+      console.log('PWA Install Prompt ready');
     });
   }
 
