@@ -39,6 +39,12 @@ import { CommonModule } from '@angular/common';
                   class="opacity-0" 
                   style="animation: fade-border-in 1.0s cubic-bezier(0.22, 1, 0.36, 1) 0.8s forwards;">
             </rect>
+            
+            <!-- Logo Text inside Border -->
+            <text x="50" y="86.5" text-anchor="middle" font-family="'Poppins', sans-serif" font-weight="700" font-size="3.5" letter-spacing="1.5" class="opacity-0" style="animation: fade-border-in 1.0s cubic-bezier(0.22, 1, 0.36, 1) 0.9s forwards;">
+              <tspan fill="white">LUMI</tspan><tspan fill="url(#flowTextGradient)">FLOW</tspan>
+            </text>
+
             <!-- Stroke: 1.2s -->
             <path d="M10 50 Q 30 20, 50 50 T 90 50" fill="none" stroke="url(#lumiGradient)" stroke-width="4" stroke-linecap="round" 
                   stroke-dasharray="100" stroke-dashoffset="100"
@@ -49,9 +55,15 @@ import { CommonModule } from '@angular/common';
                     style="animation: pop-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 2.2s forwards; opacity: 0;">
             </circle>
             <defs>
+              <!-- Gradient for the stroke -->
               <linearGradient id="lumiGradient" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" style="stop-color:#3B82F6" />
                 <stop offset="100%" style="stop-color:#06B6D4" />
+              </linearGradient>
+              <!-- Gradient for the FLOW text -->
+              <linearGradient id="flowTextGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#60A5FA" />
+                <stop offset="100%" style="stop-color:#67E8F9" />
               </linearGradient>
             </defs>
          </svg>
