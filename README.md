@@ -16,7 +16,7 @@
   Lumiflow is a cutting-edge, zoneless Angular application designed to curate, arrange, and export high-resolution photo grids into A4 PDFs. Built for performance and privacy, it performs all image processing client-side.
 </p>
 
-[View Demo](https://lumiflow.app/) · [Report Bug](https://github.com/lumiflow/issues) · [Request Feature](https://github.com/lumiflow/issues)
+[View Demo](https://lumiflow.app/) · [Report Bug](https://github.com/white-devil1/LumiFlow/issues) · [Request Feature](https://github.com/white-devil1/LumiFlow/issues)
 
 </div>
 
