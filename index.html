@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   
   <!-- SEO & Meta Tags -->
   <title>Lumiflow - Photo to PDF Storyteller</title>
@@ -10,6 +10,14 @@
   <meta name="keywords" content="photo to pdf, image grid, pdf generator, collage maker, angular, secure photo tool, client-side pdf, a4 photo layout">
   <meta name="author" content="Lumiflow">
   <meta name="theme-color" content="#1E1B4B">
+  
+  <!-- PWA Manifest & Settings -->
+  <link rel="manifest" href="assets/manifest.json">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Lumiflow">
+  <link rel="apple-touch-icon" href="https://iili.io/fSTndas.png">
   
   <!-- Schema.org for Google, WhatsApp fallback, and Microsft Teams -->
   <meta itemprop="name" content="Lumiflow - Photo to PDF Storyteller">
@@ -153,5 +161,18 @@
 </head>
 <body class="bg-[#F8FAFC] text-[#1E1B4B]">
   <app-root></app-root>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('assets/sw.js')
+          .then(registration => {
+            console.log('SW registered: ', registration);
+          })
+          .catch(registrationError => {
+            console.log('SW registration failed: ', registrationError);
+          });
+      });
+    }
+  </script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-import { Component, inject, input, output } from '@angular/core';
+import { Component, inject, input, output, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AppStateService } from '../../services/app-state.service';
@@ -32,6 +32,17 @@ import { AppStateService } from '../../services/app-state.service';
       </div>
 
       <div class="flex gap-3 items-center w-full sm:w-auto justify-end">
+        
+        @if (canInstall()) {
+           <button (click)="installPwa()" 
+                   class="hidden md:flex items-center gap-2 px-3 py-1.5 bg-white/10 hover:bg-white/20 text-white text-xs font-bold uppercase tracking-wider rounded-lg border border-white/10 transition-colors animate-pulse-slow">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-4">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+              </svg>
+              Install App
+           </button>
+        }
+
         @if (!isSetupMode()) {
            <div class="hidden md:flex gap-4 mr-4 bg-white/5 px-4 py-2 rounded-lg backdrop-blur-md border border-white/10">
               <label class="flex items-center gap-2 text-xs text-slate-300 cursor-pointer select-none hover:text-white transition-colors font-medium tracking-wide uppercase">
@@ -67,10 +78,39 @@ import { AppStateService } from '../../services/app-state.service';
   </header>
   `
 })
-export class HeaderComponent {
+export class HeaderComponent implements OnInit {
   state = inject(AppStateService);
   isSetupMode = input.required<boolean>();
   isGenerating = input.required<boolean>();
   startOver = output<void>();
   download = output<void>();
+  
+  canInstall = signal(false);
+  private deferredPrompt: any = null;
+
+  ngOnInit() {
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Prevent the mini-infobar from appearing on mobile
+      e.preventDefault();
+      // Stash the event so it can be triggered later.
+      this.deferredPrompt = e;
+      // Update UI notify the user they can install the PWA
+      this.canInstall.set(true);
+    });
+  }
+
+  async installPwa() {
+    if (!this.deferredPrompt) return;
+    
+    // Show the install prompt
+    this.deferredPrompt.prompt();
+    
+    // Wait for the user to respond to the prompt
+    const { outcome } = await this.deferredPrompt.userChoice;
+    
+    if (outcome === 'accepted') {
+      this.deferredPrompt = null;
+      this.canInstall.set(false);
+    }
+  }
 }
