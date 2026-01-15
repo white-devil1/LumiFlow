@@ -164,7 +164,8 @@
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('assets/sw.js')
+        // Register SW at root scope
+        navigator.serviceWorker.register('sw.js')
           .then(registration => {
             console.log('SW registered: ', registration);
           })
@@ -174,5 +175,5 @@
       });
     }
   </script>
-<script src="main-VW5VGIS7.js" type="module"></script></body>
+<script src="main-DV6TVN4I.js" type="module"></script></body>
 </html>
