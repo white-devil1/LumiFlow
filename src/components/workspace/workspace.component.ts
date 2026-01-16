@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnDestroy, computed } from '@angular/core';
+import { Component, inject, signal, OnDestroy, computed, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AppStateService, AppImage } from '../../services/app-state.service';
@@ -27,6 +27,7 @@ interface DragState {
 export class WorkspaceComponent implements OnDestroy {
   state = inject(AppStateService);
   imageProcessor = inject(ImageProcessorService);
+  resetSession = output<void>();
 
   activeSlotId = signal<string | null>(null);
   previewImageId = signal<string | null>(null);

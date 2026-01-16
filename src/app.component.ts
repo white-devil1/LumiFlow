@@ -44,29 +44,37 @@ export class AppComponent {
     this.showExitConfirm.set(false);
   }
 
-  downloadPdf() {
-    const validImages = this.state.images().filter(img => img.url !== null);
+  getValidImages() {
+      return this.state.images().filter(img => img.url !== null);
+  }
 
+  createPdfImages(validImages: any[]) {
+      return validImages.map(img => ({
+          url: img.url!,
+          customWidth: img.customWidth,
+          customHeight: img.customHeight,
+          customX: img.customX,
+          customY: img.customY
+      }));
+  }
+
+  getFilename() {
+      const now = new Date();
+      const dateStr = now.toISOString().split('T')[0];
+      const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '-');
+      return `lumiflow-story-${dateStr}_${timeStr}.pdf`;
+  }
+
+  downloadPdf() {
+    const validImages = this.getValidImages();
     if (validImages.length === 0) {
       alert('Please upload at least one photo.');
       return;
     }
     
     this.isGenerating.set(true);
-    
-    const pdfImages: PdfImage[] = validImages.map(img => ({
-      url: img.url!,
-      customWidth: img.customWidth,
-      customHeight: img.customHeight,
-      customX: img.customX,
-      customY: img.customY
-    }));
-    
-    // Improved naming for daily usage
-    const now = new Date();
-    const dateStr = now.toISOString().split('T')[0];
-    const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '-');
-    const filename = `lumiflow-story-${dateStr}_${timeStr}.pdf`;
+    const pdfImages: PdfImage[] = this.createPdfImages(validImages);
+    const filename = this.getFilename();
 
     this.pdfService.generatePdf(pdfImages, filename, {
       stretch: this.state.stretchImages(),
@@ -79,5 +87,54 @@ export class AppComponent {
         this.isGenerating.set(false);
       }
     });
+  }
+
+  sharePdf() {
+      const validImages = this.getValidImages();
+      if (validImages.length === 0) {
+          alert('Please upload at least one photo.');
+          return;
+      }
+
+      if (!navigator.share) {
+          alert('Sharing is not supported on this browser/device. Please use the Export PDF button instead.');
+          return;
+      }
+
+      this.isGenerating.set(true);
+      const pdfImages: PdfImage[] = this.createPdfImages(validImages);
+      const filename = this.getFilename();
+
+      this.pdfService.getPdfBlob(pdfImages, {
+          stretch: this.state.stretchImages(),
+          noMargins: this.state.noMargins()
+      }).subscribe({
+          next: async (blob) => {
+              const file = new File([blob], filename, { type: 'application/pdf' });
+              
+              if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                  try {
+                      await navigator.share({
+                          files: [file],
+                          title: 'Lumiflow Story',
+                          text: 'Check out my photo story created with Lumiflow!'
+                      });
+                  } catch (error) {
+                      if ((error as any).name !== 'AbortError') {
+                          console.error('Share failed:', error);
+                          alert('Failed to share the file.');
+                      }
+                  }
+              } else {
+                  alert('Your browser does not support sharing files directly.');
+              }
+              this.isGenerating.set(false);
+          },
+          error: (err) => {
+              console.error(err);
+              alert('Error preparing PDF for share');
+              this.isGenerating.set(false);
+          }
+      });
   }
 }

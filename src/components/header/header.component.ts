@@ -57,22 +57,36 @@ import { AppStateService } from '../../services/app-state.service';
               </label>
            </div>
 
-          <button id="header-export-btn" (click)="download.emit()" 
-                  [disabled]="isGenerating()"
-                  class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:from-blue-500 hover:to-cyan-400 rounded-full shadow-lg shadow-cyan-900/20 font-bold transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap transform active:scale-95 border border-white/10">
-            @if (isGenerating()) {
-              <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              Generating...
-            } @else {
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
-              </svg>
-              Export PDF
-            }
-          </button>
+          <div class="flex items-center gap-2">
+            <button (click)="share.emit()" 
+                    [disabled]="isGenerating()"
+                    class="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-full shadow-lg transition-all active:scale-95 border border-white/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Share PDF">
+              @if (isGenerating()) {
+                 <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              } @else {
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
+                </svg>
+              }
+            </button>
+
+            <button id="header-export-btn" (click)="download.emit()" 
+                    [disabled]="isGenerating()"
+                    class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:from-blue-500 hover:to-cyan-400 rounded-full shadow-lg shadow-cyan-900/20 font-bold transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap transform active:scale-95 border border-white/10">
+              @if (isGenerating()) {
+                <span>Generating...</span>
+              } @else {
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-5">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                </svg>
+                <span>Export PDF</span>
+              }
+            </button>
+          </div>
         }
       </div>
     </div>
@@ -85,17 +99,15 @@ export class HeaderComponent implements OnInit {
   isGenerating = input.required<boolean>();
   startOver = output<void>();
   download = output<void>();
+  share = output<void>();
   
   canInstall = signal(false);
   private deferredPrompt: any = null;
 
   ngOnInit() {
     window.addEventListener('beforeinstallprompt', (e) => {
-      // Prevent the mini-infobar from appearing on mobile
       e.preventDefault();
-      // Stash the event so it can be triggered later.
       this.deferredPrompt = e;
-      // Update UI notify the user they can install the PWA
       this.canInstall.set(true);
       console.log('PWA Install Prompt ready');
     });
@@ -103,13 +115,8 @@ export class HeaderComponent implements OnInit {
 
   async installPwa() {
     if (!this.deferredPrompt) return;
-    
-    // Show the install prompt
     this.deferredPrompt.prompt();
-    
-    // Wait for the user to respond to the prompt
     const { outcome } = await this.deferredPrompt.userChoice;
-    
     if (outcome === 'accepted') {
       this.deferredPrompt = null;
       this.canInstall.set(false);

@@ -13,7 +13,7 @@
         </div>
         Add slots
       </button>
-      <button (click)="state.resetAll()" class="text-sm text-red-500 hover:text-red-700 font-bold hover:underline ml-auto sm:ml-0 flex items-center gap-1 transition-colors group">
+      <button (click)="resetSession.emit()" class="text-sm text-red-500 hover:text-red-700 font-bold hover:underline ml-auto sm:ml-0 flex items-center gap-1 transition-colors group">
          <div class="bg-red-50 p-1 rounded-md group-hover:bg-red-100 transition-colors">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-4">
             <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15m0 0l6.75 6.75M4.5 12l6.75-6.75" />
@@ -68,7 +68,7 @@
           @for (img of page; track img.id; let imgIdx = $index) {
             <!-- Card Container -->
             <!-- Added min-w-0 min-h-0 to prevent flex/grid blowout -->
-            <!-- Changed border-slate-100 to border-slate-300 for visibility -->
+            <!-- Changed border-slate-300 to border-slate-300 for visibility -->
             <div [id]="pageIdx === 0 && imgIdx === 0 ? 'slot-0' : null"
                  class="relative group rounded-2xl flex items-center justify-center transition-all cursor-pointer
                         bg-white shadow-lg border border-slate-300 overflow-hidden w-full h-full min-w-0 min-h-0

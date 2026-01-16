@@ -23,11 +23,24 @@ declare const window: any;
 export class PdfGeneratorService {
 
   generatePdf(images: PdfImage[], filename: string = 'photos.pdf', options: PdfOptions = { stretch: false, noMargins: false }): Observable<void> {
-    // Wrap the async process in an Observable
-    return from(this.createPdf(images, filename, options));
+    return from(this.savePdfAsync(images, filename, options));
   }
 
-  private async createPdf(images: PdfImage[], filename: string, options: PdfOptions): Promise<void> {
+  getPdfBlob(images: PdfImage[], options: PdfOptions = { stretch: false, noMargins: false }): Observable<Blob> {
+    return from(this.getBlobAsync(images, options));
+  }
+
+  private async savePdfAsync(images: PdfImage[], filename: string, options: PdfOptions): Promise<void> {
+      const pdf = await this.buildPdf(images, options);
+      pdf.save(filename);
+  }
+
+  private async getBlobAsync(images: PdfImage[], options: PdfOptions): Promise<Blob> {
+      const pdf = await this.buildPdf(images, options);
+      return pdf.output('blob');
+  }
+
+  private async buildPdf(images: PdfImage[], options: PdfOptions): Promise<any> {
     if (!window.jspdf) {
       throw new Error('jsPDF not loaded');
     }
@@ -119,7 +132,7 @@ export class PdfGeneratorService {
       pdf.addImage(imgObj.url, 'JPEG', finalX, finalY, finalWidth, finalHeight);
     }
 
-    pdf.save(filename);
+    return pdf;
   }
 
   private getImageDimensions(base64: string): Promise<{width: number, height: number}> {
