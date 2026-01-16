@@ -7,12 +7,12 @@
   <!-- SEO & Meta Tags -->
   <title>Lumiflow - Photo to PDF Storyteller</title>
   <meta name="description" content="Turn your photos into beautiful A4 PDF stories instantly. Free, secure, client-side photo arrangement tool with smart grids and drag-and-drop editing.">
-  <meta name="keywords" content="photo to pdf, image grid, pdf generator, collage maker, angular, secure photo tool, client-side pdf, a4 photo layout">
+  <meta name="keywords" content="photo to pdf , image grid, pdf generator, collage maker, angular, secure photo tool, client-side pdf, a4 photo layout">
   <meta name="author" content="Lumiflow">
   <meta name="theme-color" content="#1E1B4B">
   
   <!-- PWA Manifest & Settings -->
-  <link rel="manifest" href="manifest.json">
+  <link rel="manifest" href="./src/manifest.json">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -68,6 +68,11 @@
     "@angular/forms": "https://esm.sh/@angular/forms@^21.1.0?external=rxjs"
   }
 }
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./src/sw.js');
+  }
 </script>
 <style>
   body {
