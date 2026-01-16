@@ -62,8 +62,11 @@ export class AppComponent {
       customY: img.customY
     }));
     
-    const date = new Date().toISOString().split('T')[0];
-    const filename = `photos-${date}.pdf`;
+    // Improved naming for daily usage
+    const now = new Date();
+    const dateStr = now.toISOString().split('T')[0];
+    const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '-');
+    const filename = `lumiflow-story-${dateStr}_${timeStr}.pdf`;
 
     this.pdfService.generatePdf(pdfImages, filename, {
       stretch: this.state.stretchImages(),

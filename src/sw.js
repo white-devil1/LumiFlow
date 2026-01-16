@@ -1,4 +1,4 @@
-const CACHE_NAME = 'lumiflow-v3';
+const CACHE_NAME = 'lumiflow-v8';
 const ASSETS = [
   './',
   'index.html',

@@ -17,24 +17,7 @@
               "browser": "."
             },
             "browser": "index.tsx",
-            "tsConfig": "tsconfig.json",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "src/assets",
-                "output": "assets"
-              },
-              {
-                "glob": "manifest.json",
-                "input": "src",
-                "output": "/"
-              },
-              {
-                "glob": "sw.js",
-                "input": "src",
-                "output": "/"
-              }
-            ]
+            "tsConfig": "tsconfig.json"
           },
           "configurations": {
             "production": {
