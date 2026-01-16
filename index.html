@@ -7,7 +7,7 @@
   <!-- SEO & Meta Tags -->
   <title>Lumiflow - Photo to PDF Storyteller</title>
   <meta name="description" content="Turn your photos into beautiful A4 PDF stories instantly. Free, secure, client-side photo arrangement tool with smart grids and drag-and-drop editing.">
-  <meta name="keywords" content="photo to pdf , image grid, pdf generator, collage maker, angular, secure photo tool, client-side pdf, a4 photo layout">
+  <meta name="keywords" content="photo to pdf, image grid, pdf generator, collage maker, angular, secure photo tool, client-side pdf, a4 photo layout">
   <meta name="author" content="Lumiflow">
   <meta name="theme-color" content="#1E1B4B">
   
@@ -45,8 +45,22 @@
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="https://iili.io/fSTndas.png">
 
+  <script>
+    /* Suppress Tailwind CSS CDN warning for this standalone deployment */
+    (function() {
+      var _warn = console.warn;
+      console.warn = function() {
+        if (arguments.length > 0 && typeof arguments[0] === 'string' && arguments[0].indexOf('cdn.tailwindcss.com') !== -1) return;
+        _warn.apply(console, arguments);
+      };
+    })();
+  </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  
+  <!-- Driver.js CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.0.1/dist/driver.css">
+
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -65,14 +79,10 @@
     "@angular/core": "https://esm.sh/@angular/core@^21.1.0?external=rxjs",
     "@angular/compiler": "https://esm.sh/@angular/compiler@^21.1.0?external=rxjs",
     "@angular/platform-browser": "https://esm.sh/@angular/platform-browser@^21.1.0?external=rxjs",
-    "@angular/forms": "https://esm.sh/@angular/forms@^21.1.0?external=rxjs"
+    "@angular/forms": "https://esm.sh/@angular/forms@^21.1.0?external=rxjs",
+    "driver.js": "https://esm.sh/driver.js@1.3.1?conditions=es2015"
   }
 }
-</script>
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js');
-  }
 </script>
 <style>
   body {
@@ -162,6 +172,74 @@
     70% { transform: scale(1.4); opacity: 1; }
     100% { transform: scale(1); opacity: 1; }
   }
+
+  /* Driver.js Custom Theme for LumiFlow */
+  .driver-popover.lumiflow-theme {
+    background-color: #1E1B4B;
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 10px 25px -5px rgba(6, 182, 212, 0.3);
+    border-radius: 16px;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .driver-popover.lumiflow-theme .driver-popover-title {
+    font-family: 'Poppins', sans-serif;
+    color: #22d3ee; /* Cyan-400 */
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+  
+  .driver-popover.lumiflow-theme .driver-popover-description {
+    color: #cbd5e1; /* Slate-300 */
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+  
+  .driver-popover.lumiflow-theme .driver-popover-footer button {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-shadow: none;
+    transition: all 0.2s;
+  }
+  
+  .driver-popover.lumiflow-theme .driver-popover-footer button:hover {
+    background-color: rgba(34, 211, 238, 0.2);
+    border-color: #22d3ee;
+    color: #22d3ee;
+  }
+
+  .driver-popover.lumiflow-theme .driver-popover-footer .driver-popover-next-btn {
+    background: linear-gradient(to right, #2563eb, #06b6d4);
+    border: none;
+    color: white;
+  }
+  
+  .driver-popover.lumiflow-theme .driver-popover-footer .driver-popover-next-btn:hover {
+    opacity: 0.9;
+    color: white;
+  }
+
+  .driver-popover.lumiflow-theme .driver-popover-arrow-side-left.driver-popover-arrow {
+    border-left-color: #1E1B4B;
+  }
+  
+  .driver-popover.lumiflow-theme .driver-popover-arrow-side-right.driver-popover-arrow {
+    border-right-color: #1E1B4B;
+  }
+  
+  .driver-popover.lumiflow-theme .driver-popover-arrow-side-top.driver-popover-arrow {
+    border-top-color: #1E1B4B;
+  }
+  
+  .driver-popover.lumiflow-theme .driver-popover-arrow-side-bottom.driver-popover-arrow {
+    border-bottom-color: #1E1B4B;
+  }
 </style>
 </head>
 <body class="bg-[#F8FAFC] text-[#1E1B4B]">
@@ -180,5 +258,5 @@
       });
     }
   </script>
-<script src="main-CLWEFPSH.js" type="module"></script></body>
+<script src="main-IZAI52BC.js" type="module"></script></body>
 </html>
