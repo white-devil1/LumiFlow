@@ -12,7 +12,7 @@
   <meta name="theme-color" content="#1E1B4B">
   
   <!-- PWA Manifest & Settings -->
-  <link rel="manifest" href="./src/manifest.json">
+  <link rel="manifest" href="manifest.json">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -71,7 +71,7 @@
 </script>
 <script>
   if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('./src/sw.js');
+    navigator.serviceWorker.register('sw.js');
   }
 </script>
 <style>
