@@ -5,7 +5,7 @@
         <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
         {{ state.images().length }} Slots
       </div>
-      <button (click)="state.addMoreSlots()" class="text-sm text-slate-600 hover:text-blue-600 font-bold hover:underline flex items-center gap-1 transition-colors group">
+      <button id="toolbar-add" (click)="state.addMoreSlots()" class="text-sm text-slate-600 hover:text-blue-600 font-bold hover:underline flex items-center gap-1 transition-colors group">
         <div class="bg-slate-100 p-1 rounded-md group-hover:bg-blue-50 transition-colors">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="size-4">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -60,19 +60,23 @@
            
            <div class="absolute inset-0 bg-stone-50 opacity-20 pointer-events-none hidden md:block"></div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 md:h-full gap-6"
+        <!-- GRID: Added md:grid-rows-2 to strict vertical sizing -->
+        <div class="grid grid-cols-1 md:grid-cols-2 md:grid-rows-2 md:h-full gap-6"
              [class.md:gap-4]="!state.noMargins()"
              [class.md:gap-2]="state.noMargins()">
              
           @for (img of page; track img.id; let imgIdx = $index) {
             <!-- Card Container -->
-            <div class="relative group rounded-2xl flex items-center justify-center transition-all cursor-pointer
-                        bg-white shadow-lg border border-slate-100 overflow-hidden
-                        md:shadow-none md:bg-gray-50 md:border-2 md:border-dashed md:border-slate-200 md:rounded-xl md:overflow-hidden
+            <!-- Added min-w-0 min-h-0 to prevent flex/grid blowout -->
+            <!-- Changed border-slate-100 to border-slate-300 for visibility -->
+            <div [id]="pageIdx === 0 && imgIdx === 0 ? 'slot-0' : null"
+                 class="relative group rounded-2xl flex items-center justify-center transition-all cursor-pointer
+                        bg-white shadow-lg border border-slate-300 overflow-hidden w-full h-full min-w-0 min-h-0
+                        md:shadow-none md:bg-gray-50 md:border-2 md:border-dashed md:border-slate-300 md:rounded-xl md:overflow-hidden
                         aspect-[210/297] md:aspect-auto md:h-full"
                  #cellContainer
                  (click)="toggleSlotActive(img.id, $event)"
-                 [class.md:hover:border-blue-300]="!img.url"
+                 [class.md:hover:border-blue-400]="!img.url"
                  [class.md:hover:bg-blue-50]="!img.url"
                  [class.z-30]="editingImageId() === img.id"
                  [class.ring-4]="editingImageId() === img.id"
@@ -81,7 +85,8 @@
                  [class.border-solid]="editingImageId() === img.id">
               
               @if (img.url) {
-                <div class="relative w-full h-full bg-slate-50 md:bg-transparent"
+                <!-- Changed relative to absolute inset-0 to remove from flow and prevent resizing -->
+                <div class="absolute inset-0 w-full h-full bg-slate-50 md:bg-transparent overflow-hidden"
                      [class.flex]="!img.customX && editingImageId() !== img.id"
                      [class.items-center]="!img.customX && editingImageId() !== img.id"
                      [class.justify-center]="!img.customX && editingImageId() !== img.id">
@@ -98,6 +103,7 @@
                         [style.top.%]="img.customY">
                        
                        <img [src]="img.url" 
+                            [id]="pageIdx === 0 && imgIdx === 0 ? 'slot-0-img' : null"
                             class="w-full h-full block transition-shadow duration-300" 
                             [style.object-fit]="(editingImageId() === img.id || img.customWidth) ? 'fill' : (state.stretchImages() ? 'fill' : 'contain')"
                             [class.rounded-none]="!state.noMargins() && editingImageId() !== img.id"
@@ -124,7 +130,7 @@
                   <div class="absolute inset-0 bg-[#1E1B4B]/80 transition-all duration-200 backdrop-blur-[2px] flex flex-col items-center justify-center gap-3 p-4 z-20 opacity-0 group-hover:opacity-100"
                        [class.opacity-100]="activeSlotId() === img.id">
                     
-                    <span class="text-white text-xs font-bold truncate w-full text-center px-3 py-1 bg-white/10 rounded-full border border-white/10 mb-1">
+                    <span class="text-white text-[10px] font-bold truncate block w-full text-center px-2">
                       {{ img.name }}
                     </span>
 
@@ -206,7 +212,7 @@
                  </label>
               }
 
-              <div class="absolute top-3 left-3 bg-white text-[#1E1B4B] text-xs font-extrabold w-8 h-8 flex items-center justify-center rounded-lg shadow-md z-10 border border-slate-100 font-['Poppins']">
+              <div class="absolute top-3 left-3 bg-white text-[#1E1B4B] text-xs font-extrabold w-8 h-8 flex items-center justify-center rounded-lg shadow-md z-10 border border-slate-100 font-['Poppins'] pointer-events-none">
                 {{ (pageIdx * 4) + imgIdx + 1 }}
               </div>
             </div>

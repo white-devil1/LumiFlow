@@ -57,7 +57,7 @@ import { AppStateService } from '../../services/app-state.service';
               </label>
            </div>
 
-          <button (click)="download.emit()" 
+          <button id="header-export-btn" (click)="download.emit()" 
                   [disabled]="isGenerating()"
                   class="px-6 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-500 text-white hover:from-blue-500 hover:to-cyan-400 rounded-full shadow-lg shadow-cyan-900/20 font-bold transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap transform active:scale-95 border border-white/10">
             @if (isGenerating()) {

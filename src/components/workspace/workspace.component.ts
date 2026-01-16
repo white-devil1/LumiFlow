@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AppStateService, AppImage } from '../../services/app-state.service';
 import { ImageProcessorService } from '../../services/image-processor.service';
-import { fromEvent, Subscription, takeUntil, map, switchMap, take, Observable } from 'rxjs';
+import { fromEvent, Subscription, takeUntil, map, Observable } from 'rxjs';
 
 interface DragState {
   imgId: string;
@@ -60,7 +60,9 @@ export class WorkspaceComponent implements OnDestroy {
     
     // Process one by one using RxJS would be cleaner, but simple loop works well for sequential update logic here
     const processNext = () => {
-        if (fileIdx >= files.length) return;
+        if (fileIdx >= files.length) {
+            return;
+        }
         const file = files[fileIdx];
         
         this.imageProcessor.processFile(file).subscribe({

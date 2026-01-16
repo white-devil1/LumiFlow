@@ -38,7 +38,7 @@
 
   <main class="max-w-6xl mx-auto px-4 py-8">
     @if (isSetupMode()) {
-      <app-setup (finished)="finishSetup()"></app-setup>
+       <app-setup (finished)="finishSetup()"></app-setup>
     } @else {
       <app-workspace></app-workspace>
     }

@@ -1,5 +1,6 @@
-import { Component, ChangeDetectionStrategy, output, signal, OnInit } from '@angular/core';
+import { Component, ChangeDetectionStrategy, output, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { AppStateService } from '../../services/app-state.service';
 
 @Component({
   selector: 'app-splash',
@@ -123,6 +124,7 @@ import { CommonModule } from '@angular/common';
 export class SplashComponent implements OnInit {
   dismiss = output<void>();
   showButton = signal(false);
+  state = inject(AppStateService);
 
   ngOnInit() {
     // Show button exactly when the last text animation settles (3.0s delay + 0.8s duration = 3.8s)

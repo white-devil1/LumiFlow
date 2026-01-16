@@ -92,7 +92,22 @@ export class AppStateService {
   }
 
   removeImage(id: string) {
-    this.images.update(imgs => imgs.filter(img => img.id !== id));
+    this.images.update(imgs => imgs.map(img => {
+      if (img.id === id) {
+        // Clear the data to reset the slot to empty state
+        return {
+          ...img,
+          url: null,
+          originalWidth: 0,
+          originalHeight: 0,
+          customWidth: undefined, 
+          customHeight: undefined, 
+          customX: undefined, 
+          customY: undefined
+        };
+      }
+      return img;
+    }));
   }
 
   resetAll() {

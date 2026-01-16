@@ -24,7 +24,7 @@ import { AppStateService } from '../../services/app-state.service';
             <h2 class="text-2xl md:text-3xl font-bold text-[#1E1B4B] mb-2 md:mb-3 leading-tight">Turn Your Photos Into a <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-cyan-500">Beautiful PDF Story</span></h2>
             <p class="text-slate-500 mb-6 md:mb-10 text-sm md:text-base">How many photos would you like to arrange today?</p>
 
-            <div class="mb-6 md:mb-10 bg-slate-50 p-4 md:p-6 rounded-2xl border border-slate-100">
+            <div id="setup-counter-area" class="mb-6 md:mb-10 bg-slate-50 p-4 md:p-6 rounded-2xl border border-slate-100">
               <div class="flex items-center justify-center gap-6">
                 <button class="w-10 h-10 md:w-14 md:h-14 rounded-xl bg-white shadow-sm hover:shadow-md text-slate-600 hover:text-blue-600 font-bold text-lg md:text-2xl transition-all border border-slate-200 hover:border-blue-200"
                         (click)="state.decrementCount()">
@@ -49,7 +49,7 @@ import { AppStateService } from '../../services/app-state.service';
               </p>
             </div>
 
-            <button (click)="onStart()" 
+            <button id="setup-start-btn" (click)="onStart()" 
                     class="w-full py-3 md:py-4 bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-base md:text-lg font-bold rounded-xl shadow-xl shadow-blue-200 hover:shadow-2xl hover:scale-[1.02] transition-all flex items-center justify-center gap-2 group">
               Create Your PDF
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="size-5 group-hover:translate-x-1 transition-transform">
